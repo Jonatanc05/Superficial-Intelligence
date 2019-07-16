@@ -8,7 +8,7 @@ public class Population {
     public static int fittest = -1;
     public int gen;
     
-    private boolean wait = false;
+    private boolean wait = false; //little time between two generations
     private double mutationRate;
     private int amount;
     private Square[] dots;
@@ -19,10 +19,12 @@ public class Population {
         this.amount = amount;
         dots = new Square[amount];
         for(int i = 0; i < dots.length; i++){
-            dots[i] = new Square(null, 0);
+            dots[i] = new Square(i, null, 0);
         }
     }
+
     
+    //Called every "RATE" milisseconds
     public void update(Graphics g){
         boolean end = true;
         for(Square dot : dots){
@@ -35,9 +37,11 @@ public class Population {
         if(wait) return;
         
         if(end){
-            if(fittest == -1) fittest = getFittest();
+            if(fittest == -1)
+                fittest = getFittest();
+            else if( dots[fittest].step < Screen.fastestPathMoves )
+                Screen.fastestPathMoves = dots[fittest].step;
             gen++;
-            System.out.println(fittest);
             dots[fittest].color = Color.BLUE;
             Timer restart = new Timer(0, (ActionEvent e) -> {
                 wait = false;
@@ -50,15 +54,16 @@ public class Population {
         }
     }
     
+    
+    /*
+     * Select the best square from a generation so he is the parent 
+     * of the next one. Isn't called case any square has reached 
+     * the goal, in this case, the first who did it is the fittest.
+     */
     public int getFittest(){
         double min = 999999;
         int minIdx = -1;
         for(int i = 0; i < dots.length; i++){
-            if(dots[i].color == Color.ORANGE){
-                minIdx = i;
-                break;
-            }
-            
             int xDist = 895 - dots[i].x, yDist = 43 - dots[i].y;
             double dist = Math.sqrt(xDist*xDist+yDist*yDist);
             if(dist < min){
@@ -69,28 +74,23 @@ public class Population {
         return minIdx;
     }
     
+    
+    //Reproduce the best square so all of them are similar to the fittest
     public void reproduceFittest(){
         Square aux = dots[fittest];
         aux.x = Screen.w/2;
         aux.y = Screen.h*9/10;
         aux.step = 0;
         aux.dead = false;
-        aux.veloc = new Vector(0, 0);
+        aux.veloc = new Vector(0);
         
         dots = new Square[amount];
-        dots[0] = aux;
+        //Making him the last one to be drawn and, therefore, always visible
+        dots[amount-1] = aux;
+        aux.id = amount-1;
         
-        for(int i = 1; i < dots.length; i++){
-            /*if(i == fittest){
-                dots[i].x = Screen.w/2;
-                dots[i].y = Screen.h*9/10;
-                dots[i].step = 0;
-                dots[i].dead = false;
-                dots[i].veloc = new Vector(0, 0);
-                continue;
-            }*/
-            System.out.println("dot " + i);
-            dots[i] = new Square(dots[0].brain, mutationRate);
+        for(int i = 0; i < dots.length-1; i++){
+            dots[i] = new Square(i, dots[amount-1].brain, mutationRate);
         }
         fittest = -1;
     }

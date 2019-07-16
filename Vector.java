@@ -1,27 +1,28 @@
 package ai;
 
 public class Vector implements Cloneable{
-    private double angle, module;
+    public double angle, module;
     
-    public Vector(double angle, double module){
+    public Vector(double angle){
         this.angle = angle;
-        this.module = module;
+        this.module = 10;
     }
     public Vector(){
-        this(360 * Math.random(), 5*Math.random());
+        this(360*Math.random());
     }
     
     public void add(Vector vect){
         double xresult = getX() + vect.getX();
         double yresult = getY() + vect.getY();
         
-        module = Math.sqrt(xresult*xresult + yresult*yresult);
+        //module = Math.sqrt(xresult*xresult + yresult*yresult);
         angle = Math.toDegrees(Math.atan2(yresult, xresult));
     }
     
     public void mutate(){
         //module += 2*Math.random() - 1;
-        angle += 20*Math.random() - 10;
+        //angle += 180*Math.random() - 90;
+        this.angle = 360*Math.random();
     }
     
     public int getX(){

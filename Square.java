@@ -3,6 +3,7 @@ import java.awt.*;
 
 public class Square {
     
+    public int id;
     public int x, y; //Center coords
     public Vector[] brain;
     public Color color;
@@ -10,12 +11,13 @@ public class Square {
     public Vector veloc;
     public boolean dead;
     
-    public Square(Vector[] brain, double mutationRate){
+    public Square(int id, Vector[] brain, double mutationRate){
+        this.id = id;
         this.x = Screen.w/2;
         this.y = Screen.h*9/10;
-        veloc = new Vector(0, 0);
+        veloc = new Vector(0);
         if(brain == null){
-            this.brain = new Vector[50];
+            this.brain = new Vector[100];
             for(int i = 0; i < this.brain.length; i++)
                 this.brain[i] = new Vector();
         }
@@ -29,7 +31,6 @@ public class Square {
                 double r = (new java.util.Random()).nextDouble();
                 if (r < mutationRate) {
                     this.brain[i].mutate();
-                    //System.out.println(r);
                 }
             }
         }
@@ -44,6 +45,8 @@ public class Square {
         
         g.setColor(color);
         g.fillRect(cornerX, cornerY, Screen.sqrSize, Screen.sqrSize);
+        //g.setColor(Color.BLACK);
+        //g.drawString(""+id, cornerX, cornerY+Screen.sqrSize);
     }
     
     public void move(){
@@ -66,10 +69,13 @@ public class Square {
         }
         
         //Check goal
-        if(x > 880 && x < 910 && y > 28 && y < 58 ){
+        if(x > 885 && x < 905 && y > 28 && y < 48 ){
             dead = true;
             color = Color.GREEN;
-            if(Population.fittest == -1) color = Color.ORANGE;
+            if(Population.fittest == -1){
+                Population.fittest = id;
+                color = Color.ORANGE;
+            }
         }
         
     }
